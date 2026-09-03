@@ -1,10 +1,10 @@
 # Realm 全功能一键网络转发管理,纯脚本快速搭建中转服务器
 
-[中文](README.md) | [English](README_EN.md) | [端口流量狗介绍](port-traffic-dog-README.md)
+[中文](README.md) | [English](docs/README_EN.md) | [端口流量狗脚本介绍](docs/port-traffic-dog-README.md)
 
 ---
 
-> 🚀 **网络转发管理脚本** - 同步官方 Realm 最新版全部功能，网络链路测试，端口流量犬，保持极简本质,可视化规则操作提高效率，纯脚本构建网络转发服务
+> 🚀 **网络转发管理脚本** - 同步官方 Realm 最新版全部功能，网络链路测试，端口流量狗，保持极简本质,可视化规则操作提高效率，纯脚本构建网络转发服务
 
 ## 脚本界面预览
 
@@ -13,11 +13,11 @@
 
 ### xwPF.sh realm转发脚本
 
-![81ce7ea9e40068f6fda04b66ca3bd1ff.gif](https://i.mji.rip/2025/12/12/81ce7ea9e40068f6fda04b66ca3bd1ff.gif)
+![xwPF主脚本界面](docs/xwpf主脚本.gif)
 
-### 端口流量犬
+### 端口流量狗
 
-![cc59017896d277a8b35109ae44eac977.gif](https://i.mji.rip/2025/12/12/cc59017896d277a8b35109ae44eac977.gif)
+![端口流量狗界面](docs/流量狗.gif)
 
 ### 中转网络链路测试脚本
 ```
@@ -99,49 +99,81 @@ wget -qO- https://v6.gh-proxy.org/https://raw.githubusercontent.com/zywe03/realm
 
 适用于完全无法连接网络
 
-**下载必要文件**
+**1. 在有网络的设备上下载以下文件**
 
-在有网络的设备上下载以下文件：
-- **脚本文件下载**：[xwPF.sh](https://github.com/zywe03/realm-xwPF/raw/main/xwPF.sh) (右键点击 → 另存为)
-- **Realm 程序下载**（根据系统架构选择）：
+- **主脚本**：[xwPF.sh](https://github.com/zywe03/realm-xwPF/raw/main/xwPF.sh)
+- **模块文件**（全部需要）：https://github.com/zywe03/realm-xwPF/tree/main/lib
+
+- **Realm 程序**（根据系统架构选择）：
 
 | 架构 | 适用系统 | 下载链接 | 检测命令 |
 |------|----------|----------|----------|
-| x86_64 | 常见64位系统 | [realm-x86_64-unknown-linux-gnu.tar.gz](https://github.com/zhboner/realm/releases/download/v2.7.0/realm-x86_64-unknown-linux-gnu.tar.gz) | `uname -m` 显示 `x86_64` |
-| aarch64 | ARM64系统 | [realm-aarch64-unknown-linux-gnu.tar.gz](https://github.com/zhboner/realm/releases/download/v2.7.0/realm-aarch64-unknown-linux-gnu.tar.gz) | `uname -m` 显示 `aarch64` |
-| armv7 | ARM32系统（如树莓派） | [realm-armv7-unknown-linux-gnueabihf.tar.gz](https://github.com/zhboner/realm/releases/download/v2.7.0/realm-armv7-unknown-linux-gnueabihf.tar.gz) | `uname -m` 显示 `armv7l` 或 `armv6l` |
+| x86_64 | 常见64位系统 | [realm-x86_64-unknown-linux-gnu.tar.gz](https://github.com/zhboner/realm/releases/latest) | `uname -m` 显示 `x86_64` |
+| aarch64 | ARM64系统 | [realm-aarch64-unknown-linux-gnu.tar.gz](https://github.com/zhboner/realm/releases/latest) | `uname -m` 显示 `aarch64` |
+| armv7 | ARM32系统（如树莓派） | [realm-armv7-unknown-linux-gnueabihf.tar.gz](https://github.com/zhboner/realm/releases/latest) | `uname -m` 显示 `armv7l` 或 `armv6l` |
 
-随便创建一个目录放置脚本和压缩包文件（压缩包不能放在目录/usr/local/bin/）,bash指令启动脚本选择**1. 安装配置**会提示**离线安装realm输入完整路径(回车默认自动下载):**
+**2. 将文件放置到目标服务器**
+
+```
+/usr/local/bin/            ← 脚本安装目录（固定路径）
+├── xwPF.sh                ← 主脚本
+└── lib/                   ← 创建 lib 子目录
+    ├── core.sh
+    ├── rules.sh
+    ├── server.sh
+    ├── realm.sh
+    └── ui.sh
+
+~/                         ← Realm 压缩包放在任意其他位置
+└── realm-xxx.tar.gz
+```
+
+**3. 执行离线安装**
+
+```bash
+chmod +x /usr/local/bin/xwPF.sh
+ln -sf /usr/local/bin/xwPF.sh /usr/local/bin/pf
+bash /usr/local/bin/xwPF.sh
+```
+
+选择 **1. 安装配置** 后：
+1. 提示 **是否更新脚本？(y/N):** → 直接回车跳过（离线无法更新）
+2. 提示 **离线安装realm输入完整路径(回车默认自动下载):** → 输入 Realm 压缩包的完整路径即可
 
 </details>
 
+
 ## ✨ 核心特性
 
-- **快速体验** -一键安装快速轻量上手体验网络转发
-- **故障转移** - 使用系统工具,完成自动故障检测,保持轻量化
-- **负载均衡** - 支持轮询、IP哈希等策略，可配置权重分配
+- **原生Realm全功能** - 同步支持最新版realm的所有原生功能
+  - tcp/udp协议
+  - ws/wss/tls 加密解密并转发
+  - 单中转多出口
+  - 多中转单出口
+  - Proxy Protocol
+  - MPTCP
+  - 指定中转机的某个入口 IP,或指定某个出口 IP (适用于多IP情况和一入口多出口和多入口一出口的情况)
+  - 指定中转机的入口网卡,或指定某个出口网卡 (适用于多网卡情况)
+  - 更多玩法参考[zhboner/realm](https://github.com/zhboner/realm)
+- **多发行版支持** - 适配 Debian/Ubuntu、Alpine、CentOS/RHEL 系列，自动识别包管理器与 init 系统（systemd / OpenRC）
+- **服务自愈** - systemd/OpenRC 双端服务异常自动重启，内置熔断防止连续崩溃刷屏
+- **快速体验** - 一键安装快速轻量上手体验网络转发
+- **智能检测** - 自动检测系统架构、端口冲突,连接可用性
+
+- **转发协议选择** - 每条规则可选纯TCP/纯UDP/双栈（both 默认）；纯UDP自动降级 standard 并跳过 ws/tls 选择（transport 挂的 TCP ConnectOpts 对纯UDP无效）；状态标签显示 [纯TCP]/[纯UDP]，both 不显标签
 - **搭建隧道** - 双端realm架构支持 TLS,ws,wss,搭建隧道
+- **负载均衡** - 支持轮询、IP哈希等策略，可配置权重分配
+- **故障转移** - 使用系统工具,完成自动故障检测,保持轻量化
 - **规则备注** - 清晰的备注功能,不再需要额外记忆
-- **端口流量犬** - 统计端口流量，控制端口限速，限流，可设置通知方式
+
+- **端口流量狗** - 统计端口与整机流量（整机默认开启），控制端口/整机限速，限流，可设置通知方式
 - **直观配置系统MPTCP** - 清晰的展示MPTCP界面
 - **网络链路脚本** - 测试链路延迟、带宽、稳定性,大包路由情况（基于hping3 & iperf3 & nexttrace & bgp.tools）
 
 - **一键导出** - 打包全部文件为压缩包自由迁移(包括备注等等信息完全迁移)
 - **一键导入** - 识别导出的压缩包完成自由迁移
 - **一键识别批量导入** 自写realm的规则配置,方便管理和维护自己的规则集
-- **智能检测** - 自动检测系统架构、端口冲突,连接可用性
-
 - **完整卸载** - 分阶段全面清理，“轻轻的我走了，正如我轻轻的来”
-- **原生Realm全功能** - 同步支持最新版realm的所有原生功能
-- tcp/udp协议
-- ws/wss/tls 加密解密并转发
-- 单中转多出口
-- 多中转单出口
-- Proxy Protocol
-- MPTCP
-- 指定中转机的某个入口 IP,或指定某个出口 IP (适用于多IP情况和一入口多出口和多入口一出口的情况)
-- 指定中转机的入口网卡,或指定某个出口网卡 (适用于多网卡情况)
-- 更多玩法参考[zhboner/realm](https://github.com/zhboner/realm)
 
 ## 示意图理解不同场景下工作原理(推荐阅读理解)
 
@@ -154,7 +186,7 @@ wget -qO- https://v6.gh-proxy.org/https://raw.githubusercontent.com/zywe03/realm
 
 所以整个链路的加密协议由出口机业务软件决定
 
-![e3c0a9ebcee757b95663fc73adc4e880.png](https://i.mji.rip/2025/07/17/e3c0a9ebcee757b95663fc73adc4e880.png)
+![单端转发架构](docs/单端转发架构.png)
 
 </details>
 
@@ -167,7 +199,7 @@ wget -qO- https://v6.gh-proxy.org/https://raw.githubusercontent.com/zywe03/realm
 
 #### 所以中转机realm选择的加密,伪装域名等等,必须与落地机一致,否则无法解密
 
-![4c1f0d860cd89ca79f4234dd23f81316.png](https://i.mji.rip/2025/07/17/4c1f0d860cd89ca79f4234dd23f81316.png)
+![双端隧道架构](docs/双端隧道架构.png)
 
 </details>
 
@@ -175,10 +207,10 @@ wget -qO- https://v6.gh-proxy.org/https://raw.githubusercontent.com/zywe03/realm
 <summary><strong>负载均衡+故障转移</strong></summary>
 
 - 同一端口转发有多个落地机
-![a9f7c94e9995022557964011d35c3ad4.png](https://i.mji.rip/2025/07/15/a9f7c94e9995022557964011d35c3ad4.png)
+![负载均衡](docs/负载均衡.png)
 
 - 前置>多中转>单落地
-![2cbc533ade11a8bcbbe63720921e9e05.png](https://i.mji.rip/2025/07/17/2cbc533ade11a8bcbbe63720921e9e05.png)
+![前置多中转单落地](docs/前置多中转单落地.png)
 
 - `轮询`模式 (roundrobin)
 
@@ -254,15 +286,13 @@ IP地址：MPTCP协议需要知道可以使用哪些IP地址建立子流
 
 端口转发只负责把某个端口的流量转发到另一个端口
 
-链式代理是这样
+链式代理是分成了两段代理链,所以又称为分段代理,二级代理（有机会再细讲配置）
 
-分成了两段代理链,所以又称为分段代理,二级代理（有机会再细讲配置）
-
-**各有各的优点**看使用场景 | 注意有的机不允许安装代理 | 不过某些场景链式会很灵活
+**各有各的优点**看使用场景 | 注意有的地区服务器不允许安装代理 | 不过某些场景链式会很灵活
 
 | 链式代理 (Chained Proxy) | 端口转发 (Port Forwarding) |
 | :------------------- | :--------------------- |
-| 链路的机都要安装代理软件           | 中转机安装转发,出口机安装代理        |
+| 链路的机都要安装代理软件           | 中转机安装转发(不需要安装代理),出口机安装代理        |
 | 配置文件复杂度较高            | 配置文件复杂度低（L4层转发）        |
 | 会有每跳解包/封包开销          | 原生 TCP/UDP 透传，理论上更快    |
 | 出站控制分流更精确（每跳配置出口）    | 难出站控制                  |
@@ -277,63 +307,87 @@ IP地址：MPTCP协议需要知道可以使用哪些IP地址建立子流
 | `curl`     | 下载和IP获取   | `wget`      | 备用下载工具     |
 | `tar`      | 解压缩工具     | `unzip`     | ZIP解压缩        |
 | `bc`       | 数值计算       | `nc`        | 网络连接测试     |
-| `grep`/`cut` | 文本处理识别 | `inotify`   | 标记文件         |
-| `iproute2` | MPTCP端点管理  | `jq`        | JSON数据处理     |
-| `nftables` | 端口流量统计   | `tc`        | 流量控制限制     |
-
+| `bash /dev/tcp` | 网络连接测试（内置） | `inotify`   | 标记文件         |
+| `grep`/`cut` | 文本处理识别 | `jq`        | JSON数据处理     |
+| `iproute2` | MPTCP端点管理  | `nftables`  | 端口流量统计     |
+| `tc`       | 流量控制限制   |             |                  |
 
 ## 文件结构
 
-全部安装完成后的文件组织结构：
+> 脚本按需索取，其他功能点击对应菜单才会下载
+
+### 使用realm转发核心安装（安装即有）
 
 ```
-📦 系统文件
+系统文件
 ├── /usr/local/bin/
 │   ├── realm                    # Realm 主程序
-│   ├── xwPF.sh                  # 管理脚本主体
-│   ├── port-traffic-dog.sh      # 端口流量犬脚本
-│   ├── pf                       # 快捷启动命令
-│   └── dog                      # 端口流量犬快捷命令
+│   ├── xwPF.sh                  # 管理脚本入口
+│   ├── lib/                     # 模块目录
+│   │   ├── core.sh              # 核心工具（系统检测/依赖/网络/验证）
+│   │   ├── rules.sh             # 规则管理（规则CRUD/负载均衡/权重）
+│   │   ├── server.sh            # 服务器配置（中转/出口交互/MPTCP管理）
+│   │   ├── realm.sh             # Realm 安装/配置生成/服务管理
+│   │   └── ui.sh                # 交互菜单/状态显示/卸载
+│   └── pf                       # 快捷启动命令
 │
-├── /etc/realm/                  # Realm配置目录
+├── /etc/realm/                  # Realm 配置目录
 │   ├── manager.conf             # 状态管理文件
 │   ├── config.json              # Realm 工作配置文件
-│   ├── rules/                   # 转发规则目录
-│   │   ├── rule-1.conf          # 规则1配置
-│   │   ├── rule-2.conf          # 规则2配置
-│   │   └── ...
-│   └── health/                  # 健康检查目录（故障转移）
-│       └── health_status.conf   # 健康状态文件
+│   └── rules/                   # 转发规则目录
+│       ├── rule-1.conf          # 规则1配置
+│       └── ...
 │
-├── /etc/port-traffic-dog/       # 端口流量犬配置目录
-│   ├── config.json              # 流量监控配置文件
-│   ├── traffic_data.json        # 流量备份数据（重启恢复用）
-│   ├── notifications/           # 通知模块目录
-│   │   └── telegram.sh          # Telegram通知模块
-│   └── logs/                    # 日志目录
-│       └── traffic.log          # 流量日志
-│
-├── /etc/systemd/system/
-│   ├── realm.service            # 主服务文件
-│   ├── realm-health-check.service  # 健康检查服务
-│   └── realm-health-check.timer    # 健康检查定时器
-│
-├── /etc/sysctl.d/
-│   └── 90-enable-MPTCP.conf     # MPTCP系统配置文件
-│
-└── /var/log/
-    └── port-traffic-dog.log     # 端口流量犬日志
+└── /etc/systemd/system/
+    └── realm.service            # Realm 主服务文件
+```
+
+### 按需下载（点击对应功能时才会下载）
+
+```
+故障转移（开启故障转移时下载）
+├── /usr/local/bin/xwFailover.sh         # 故障转移管理脚本
+├── /etc/realm/health/
+│   └── health_status.conf               # 健康状态文件
+└── /etc/systemd/system/
+    ├── realm-health-check.service       # 健康检查服务
+    └── realm-health-check.timer         # 健康检查定时器
+
+端口流量狗（选择端口流量狗时下载）
+├── /usr/local/bin/port-traffic-dog.sh   # 端口流量狗脚本
+├── /usr/local/bin/dog                   # 快捷启动命令
+└── /etc/port-traffic-dog/
+    ├── config.json                      # 流量监控配置文件
+    ├── traffic_data.json                # 流量数据备份
+    ├── vps_traffic.json                 # 整机流量采集数据
+    ├── notifications/                   # 通知模块目录
+    │   ├── telegram.sh                  # Telegram通知模块
+    │   └── webhook.sh                   # Webhook通知模块(企业微信/飞书/钉钉)
+    └── logs/                            # 日志目录
+
+中转网络链路测试（选择链路测试时下载）
+└── /usr/local/bin/speedtest.sh          # 网络链路测试脚本
+
+配置识别导入（选择识别导入时下载）
+└── /etc/realm/xw_realm_OCR.sh           # Realm配置识别脚本
+
+MPTCP（启用MPTCP时创建）
+└── /etc/sysctl.d/90-enable-MPTCP.conf   # MPTCP系统配置
 ```
 
 ## 🤝 技术支持
 
 - **其他开源项目：** [https://github.com/zywe03](https://github.com/zywe03)
-- **介绍主页：** [https://zywe.de](https://zywe.de)
+- **了解更多：** [https://zywe.de](https://zywe.de)
 - **问题反馈：** [GitHub Issues](https://github.com/zywe03/realm-xwPF/issues)
-- **纯闲聊群** [tg交流群](https://t.me/zywe_chat) 
+- **Linux.do** [https://linux.do/](https://linux.do/)
 
 ---
 
 **⭐ 如果这个项目对您有帮助，请给个 Star 支持一下！**
 
-[![Star History Chart](https://api.star-history.com/svg?repos=zywe03/realm-xwPF&type=Date)](https://www.star-history.com/#zywe03/realm-xwPF&Date)
+## 💖 如果对你有帮助
+
+<img src="docs/zywe_赞赏码.jpg" alt="zywe赞赏码" width="50%">
+
+[![Star History Chart](https://star-history.dera.page/svg?repos=zywe03/realm-xwPF&type=Date)](https://star-history.dera.page/#zywe03/realm-xwPF&Date)
